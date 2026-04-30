@@ -1,0 +1,12 @@
+{
+    "autodeskProduct": "Fusion360",
+    "type": "addin",
+    "id": "bridge-f360-infab-upload-00001",
+    "author": "Infab",
+    "description": {
+        "": "Upload design files and supporting documents to Infab part definitions directly from Fusion 360."
+    },
+    "version": "0.1.0",
+    "runOnStartup": true,
+    "supportedOS": "windows|mac"
+}
