@@ -1,0 +1,141 @@
+name: Auto Release Beta
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  beta-release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Lint
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: check
+
+      - name: Format check
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: format --check
+
+      - name: Syntax check
+        run: python -m compileall -q .
+
+      - name: Compute next beta version from tags
+        id: version
+        run: |
+          python3 << 'SCRIPT'
+          import os, re, subprocess
+
+          with open("Bridge/bridge_config.py") as f:
+              match = re.search(r"VERSION\s*=\s*['\"]([^'\"]+)['\"]", f.read())
+          current = match.group(1)
+
+          base_match = re.match(r"^(\d+)\.(\d+)\.(\d+)", current)
+          major = int(base_match.group(1))
+          minor = int(base_match.group(2))
+          patch = int(base_match.group(3))
+          next_patch = patch + 1
+          prefix = f"v{major}.{minor}.{next_patch}-beta."
+
+          result = subprocess.run(
+              ["git", "tag", "-l", f"{prefix}*"],
+              capture_output=True, text=True,
+          )
+          existing = result.stdout.strip().splitlines()
+
+          beta_num = 1
+          if existing:
+              nums = []
+              for tag in existing:
+                  try:
+                      nums.append(int(tag.split("-beta.")[-1]))
+                  except ValueError:
+                      pass
+              if nums:
+                  beta_num = max(nums) + 1
+
+          new_version = f"{major}.{minor}.{next_patch}-beta.{beta_num}"
+          print(f"Current stable: {current} -> Beta: {new_version}")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"version={new_version}\n")
+          SCRIPT
+
+      - name: Set version in working directory for packaging
+        run: |
+          python3 << 'SCRIPT'
+          import json, re
+
+          version = "${{ steps.version.outputs.version }}"
+
+          config_path = "Bridge/bridge_config.py"
+          with open(config_path) as f:
+              text = f.read()
+          text = re.sub(
+              r"(VERSION\s*=\s*['\"])[^'\"]+(['\"])",
+              rf"\g<1>{version}\g<2>",
+              text,
+          )
+          with open(config_path, "w") as f:
+              f.write(text)
+
+          manifest_path = "Bridge/Bridge.manifest"
+          with open(manifest_path) as f:
+              manifest = json.load(f)
+          manifest["version"] = version
+          with open(manifest_path, "w") as f:
+              json.dump(manifest, f, indent=4)
+              f.write("\n")
+          SCRIPT
+
+      - name: Force DEV_MODE to False
+        run: |
+          python3 -c "
+          import re
+          path = 'Bridge/bridge_config.py'
+          with open(path) as f:
+              text = f.read()
+          text = re.sub(r'DEV_MODE\s*=\s*True', 'DEV_MODE = False', text)
+          with open(path, 'w') as f:
+              f.write(text)
+          print('DEV_MODE forced to False')
+          "
+
+      - name: Package release
+        run: |
+          zip -r "Bridge-v${{ steps.version.outputs.version }}.zip" Bridge/ \
+            -x "Bridge/__pycache__/*" "Bridge/**/__pycache__/*" "Bridge/**/*.pyc"
+
+      - name: Generate checksum
+        run: shasum -a 256 "Bridge-v${{ steps.version.outputs.version }}.zip" > SHA256SUMS
+
+      - name: Create tag and pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+
+          gh release create "v${{ steps.version.outputs.version }}" \
+            "Bridge-v${{ steps.version.outputs.version }}.zip" \
+            SHA256SUMS \
+            --title "Bridge v${{ steps.version.outputs.version }}" \
+            --generate-notes \
+            --prerelease
