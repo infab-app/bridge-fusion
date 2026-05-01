@@ -1,12 +1,12 @@
 # Bridge for Autodesk Fusion
 
-**A Fusion 360 add-in by [Infab Softworks](https://infab.app)** that connects Autodesk Fusion to [Infab Bridge](https://bridge.infab.app), enabling users to upload design files and supporting documents to Infab part definitions directly from within Fusion 360. Bridge embeds a palette inside Fusion that provides seamless access to your Infab workspace without leaving the CAD environment.
+**An Autodesk Fusion add-in by [Infab Softworks](https://infab.app)** that connects Autodesk Fusion to [Infab Bridge](https://bridge.infab.app), enabling users to upload design files and supporting documents to Infab part definitions directly from within Fusion. Bridge embeds a palette inside Fusion that provides seamless access to your Infab workspace without leaving the CAD environment.
 
 > **Note:** Bridge for Fusion is the open-source client add-in for [Infab Bridge](https://infab.app), a cloud platform that requires an active Infab subscription. The add-in source code is publicly available, but a subscription is required to authenticate and use the service.
 
 ## How It Works
 
-Bridge adds an **Infab Bridge** palette to Fusion 360 that connects directly to your Infab account. From there you can browse parts, upload design files, and download files back into Fusion — all without leaving the application.
+Bridge adds an **Infab Bridge** palette to Fusion that connects directly to your Infab account. From there you can browse parts, upload design files, and download files back into Fusion — all without leaving the application.
 
 1. **Sign In** — Authenticate with your Infab account through the embedded palette
 2. **Browse & Select** — Navigate your Infab parts and definitions within Fusion
@@ -15,7 +15,7 @@ Bridge adds an **Infab Bridge** palette to Fusion 360 that connects directly to 
 
 ### Key Features
 
-- **Embedded Palette** — A docked HTML palette inside Fusion 360 provides full access to your Infab Bridge workspace without switching applications.
+- **Embedded Palette** — A docked HTML palette inside Fusion provides full access to your Infab Bridge workspace without switching applications.
 - **Multi-Format Export** — Export and upload designs in F3D (Fusion Archive), STEP, STL, and IGES formats. Supports exporting entire designs, individual components, or the root component only.
 - **File Import** — Download files from Infab and open them directly in Fusion with automatic format detection.
 - **Secure Authentication** — OAuth-style session management with token exchange, automatic session refresh, and encrypted session persistence.
@@ -32,8 +32,8 @@ The `Bridge` folder in this repository is the complete add-in. Copy just this fo
 2. Download `Bridge-v{version}.zip`
 3. Extract the zip — you'll get a `Bridge/` folder
 4. Drag-and-drop or copy the `Bridge` folder into Autodesk Fusion's add-ins directory:
-   - **Windows:** `%AppData%\Autodesk\Autodesk Fusion 360\API\AddIns\`
-   - **macOS:** `~/Library/Application Support/Autodesk/Autodesk Fusion 360/API/AddIns/`
+   - **Windows:** `%AppData%\Autodesk\Autodesk Fusion\API\AddIns\`
+   - **macOS:** `~/Library/Application Support/Autodesk/Autodesk Fusion/API/AddIns/`
 
 **Option 2: Download the repository as a ZIP**
 
@@ -45,7 +45,7 @@ The `Bridge` folder in this repository is the complete add-in. Copy just this fo
 **Windows:**
 ```
 git clone https://github.com/infab-app/bridge-fusion.git
-xcopy /E bridge-fusion\Bridge "%AppData%\Autodesk\Autodesk Fusion 360\API\AddIns\Bridge\"
+xcopy /E bridge-fusion\Bridge "%AppData%\Autodesk\Autodesk Fusion\API\AddIns\Bridge\"
 ```
 
 **macOS:**
@@ -92,7 +92,7 @@ Once running, Bridge adds a **Bridge** tab to the toolbar in both the Design and
 
 ### Uploading Design Files
 
-1. Open or create a design in Fusion 360
+1. Open or create a design in Fusion
 2. Open the Bridge palette and navigate to a part definition
 3. Select the export format (F3D, STEP, STL, or IGES) and component scope
 4. Files are exported to a temporary directory, uploaded to Infab via presigned URLs, and cleaned up automatically
@@ -101,7 +101,7 @@ Once running, Bridge adds a **Bridge** tab to the toolbar in both the Design and
 
 1. Browse your Infab parts in the Bridge palette
 2. Select a file to download
-3. The file is downloaded and opened directly in Fusion 360
+3. The file is downloaded and opened directly in Fusion
 
 ## Repository Structure
 
@@ -139,7 +139,7 @@ Each line is a JSON object with timestamp, event name, detail, severity, user, a
 
 ## Requirements
 
-- **Autodesk Fusion 360** (Windows or macOS)
+- **Autodesk Fusion** (Windows or macOS)
 - **Infab subscription** — Bridge connects to [Infab Bridge](https://bridge.infab.app), which requires an active Infab account. [Learn more at infab.app](https://infab.app).
 - **Internet connection** — Required for authentication and file upload/download
 
