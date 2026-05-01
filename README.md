@@ -6,19 +6,19 @@
 
 ## How It Works
 
-Bridge adds an **Infab Bridge** palette to Fusion that connects directly to your Infab account. From there you can browse parts, upload design files, and download files back into Fusion — all without leaving the application.
+Bridge adds an **Infab Bridge** palette to Fusion that connects directly to your Infab account. From there you can browse parts, upload design files, and load models into Fusion, all without leaving the application.
 
 1. **Sign In** — Authenticate with your Infab account through the embedded palette
 2. **Browse & Select** — Navigate your Infab parts and definitions within Fusion
-3. **Export & Upload** — Export your active design in F3D, STEP, STL, or IGES format and upload directly to a part definition via presigned URLs
-4. **Download & Open** — Pull files from Infab and open them in Fusion in supported formats (F3D, STEP, IGES, STL, SAT, SMT)
+3. **Upload** — Select a design and have it uploaded directly to a line item as a supporting document
+4. **Download** — Download models from Infab and load them directly into Fusion in supported formats 
 
 ### Key Features
 
 - **Embedded Palette** — A docked HTML palette inside Fusion provides full access to your Infab Bridge workspace without switching applications.
-- **Multi-Format Export** — Export and upload designs in F3D (Fusion Archive), STEP, STL, and IGES formats. Supports exporting entire designs, individual components, or the root component only.
-- **File Import** — Download files from Infab and open them directly in Fusion with automatic format detection.
-- **Secure Authentication** — OAuth-style session management with token exchange, automatic session refresh, and encrypted session persistence.
+- **Multi-Format Upload** — Upload designs or Fusion exports as supporting documents to line items.
+- **Model Download** — Download models from Infab and load them directly into Fusion with automatic format detection.
+- **Secure Authentication** — Session management with token exchange, automatic session refresh, and secure local session persistence.
 - **Structured Logging** — Per-session JSONL log files with timestamps, event details, severity levels, and machine context for diagnostics and troubleshooting.
 - **Cross-Platform** — Single Python codebase for Windows and macOS.
 
@@ -94,14 +94,14 @@ Once running, Bridge adds a **Bridge** tab to the toolbar in both the Design and
 
 1. Open or create a design in Fusion
 2. Open the Bridge palette and navigate to a part definition
-3. Select the export format (F3D, STEP, STL, or IGES) and component scope
-4. Files are exported to a temporary directory, uploaded to Infab via presigned URLs, and cleaned up automatically
+3. Select the file and click upload
+4. Your design is uploaded to Infab via authenticated URLs
 
-### Downloading Files
+### Downloading Models
 
 1. Browse your Infab parts in the Bridge palette
-2. Select a file to download
-3. The file is downloaded and opened directly in Fusion
+2. Select a model to download
+3. The model is downloaded and loaded directly into Fusion
 
 ## Repository Structure
 
