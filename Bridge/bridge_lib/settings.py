@@ -14,6 +14,8 @@ _DEFAULTS = {
     "auth_url": config.AUTH_URL,
     "bridge_app_url": config.BRIDGE_APP_URL,
     "api_url": config.API_URL,
+    "update_channel": "stable",
+    "auto_check_updates": False,
     "version": 1,
 }
 
@@ -88,3 +90,20 @@ class Settings:
     @api_url.setter
     def api_url(self, value: str):
         self._data["api_url"] = value
+
+    @property
+    def update_channel(self) -> str:
+        return self._data.get("update_channel", "stable")
+
+    @update_channel.setter
+    def update_channel(self, value: str):
+        if value in ("stable", "beta"):
+            self._data["update_channel"] = value
+
+    @property
+    def auto_check_updates(self) -> bool:
+        return bool(self._data.get("auto_check_updates", False))
+
+    @auto_check_updates.setter
+    def auto_check_updates(self, value: bool):
+        self._data["auto_check_updates"] = value

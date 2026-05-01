@@ -6,6 +6,7 @@ _handlers = []
 
 
 def register_commands(ui: adsk.core.UserInterface):
+    from bridge_commands.check_update import CheckUpdateCommand
     from bridge_commands.open_bridge import OpenBridgeCommand
     from bridge_commands.view_log import ViewLogCommand
 
@@ -23,6 +24,13 @@ def register_commands(ui: adsk.core.UserInterface):
             "Open the Bridge log file for debugging.",
             "",
             ViewLogCommand,
+        ),
+        (
+            config.CMD_CHECK_UPDATE,
+            "Check for Updates",
+            "Check for a newer version of Bridge.",
+            "",
+            CheckUpdateCommand,
         ),
     ]
 

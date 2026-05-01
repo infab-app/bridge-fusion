@@ -45,6 +45,14 @@ def create_ui(app: adsk.core.Application):
             if ctrl:
                 ctrl.isVisible = True
 
+        update_def = ui.commandDefinitions.itemById(config.CMD_CHECK_UPDATE)
+        if update_def:
+            ctrl = panel.controls.itemById(config.CMD_CHECK_UPDATE)
+            if not ctrl:
+                ctrl = panel.controls.addCommand(update_def)
+            if ctrl:
+                ctrl.isVisible = True
+
 
 def destroy_ui(app: adsk.core.Application):
     ui = app.userInterface
