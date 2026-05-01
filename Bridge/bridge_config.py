@@ -4,7 +4,7 @@ from pathlib import Path
 
 ADDIN_NAME = "Bridge"
 COMPANY_NAME = "Infab"
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 
 ADDIN_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
 
