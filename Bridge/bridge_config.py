@@ -51,6 +51,22 @@ SETTINGS_FILE = _BASE_DIR / "settings.json"
 TEMP_EXPORT_DIR = _BASE_DIR / "temp_exports"
 LOG_DIR = _BASE_DIR / "logs"
 
+# Update system
+CMD_CHECK_UPDATE = "bridge_check_update"
+CUSTOM_EVENT_UPDATE_CHECK = "Bridge_UpdateCheck"
+GITHUB_OWNER = "infab-app"
+GITHUB_REPO = "bridge-fusion"
+GITHUB_API_BASE = "https://api.github.com"
+UPDATE_CHECK_TIMEOUT = 15
+UPDATE_STAGING_DIR = _BASE_DIR / "update_staging"
+UPDATE_PENDING_FILE = _BASE_DIR / "update_pending.json"
+UPDATE_BACKUP_DIR = _BASE_DIR / "update_backup"
+
+# Startup readiness timing
+AUTO_START_READY_TIMEOUT = 60
+AUTO_START_READY_POLL = 2
+AUTO_START_POST_READY_DELAY = 3
+
 # Icon resource paths
 ICON_BRIDGE = str(ADDIN_DIR / "resources" / "bridge")
 
