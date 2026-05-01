@@ -1,7 +1,6 @@
 import traceback
 
 import adsk.core
-
 from bridge_lib.palette_manager import PaletteManager
 
 _handlers = []
@@ -20,9 +19,7 @@ class OpenBridgeCommand(adsk.core.CommandCreatedEventHandler):
             cmd.isAutoExecute = True
         except Exception:
             app = adsk.core.Application.get()
-            app.userInterface.messageBox(
-                f"Open Bridge failed:\n{traceback.format_exc()}"
-            )
+            app.userInterface.messageBox(f"Open Bridge failed:\n{traceback.format_exc()}")
 
 
 class _OpenBridgeExecuteHandler(adsk.core.CommandEventHandler):
@@ -34,6 +31,4 @@ class _OpenBridgeExecuteHandler(adsk.core.CommandEventHandler):
             PaletteManager.instance().show_bridge_palette()
         except Exception:
             app = adsk.core.Application.get()
-            app.userInterface.messageBox(
-                f"Open Bridge failed:\n{traceback.format_exc()}"
-            )
+            app.userInterface.messageBox(f"Open Bridge failed:\n{traceback.format_exc()}")

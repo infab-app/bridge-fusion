@@ -5,6 +5,7 @@ import urllib.error
 from typing import Optional
 
 import bridge_config as config
+
 from bridge_lib.infab_client import InfabClient
 from bridge_lib.integrity import is_envelope, unwrap_and_verify, wrap_with_checksum
 from bridge_lib.path_validation import secure_file_permissions, secure_mkdir
@@ -130,7 +131,9 @@ class AuthManager:
                 self._delete_session_file()
             else:
                 # Keep session key in memory for IPC injection; server may be temporarily down
-                logger.warning(f"Server returned {e.code} during session restore, keeping session on disk")
+                logger.warning(
+                    f"Server returned {e.code} during session restore, keeping session on disk"
+                )
                 self._user_info = None
         except Exception:
             # Network error — keep session file for next attempt
@@ -141,9 +144,7 @@ class AuthManager:
         secure_mkdir(config.SESSION_FILE.parent)
         data = {"session_key": self._session_key}
         envelope = wrap_with_checksum(data)
-        tmp = config.SESSION_FILE.with_suffix(
-            f".tmp.{__import__('uuid').uuid4().hex[:8]}"
-        )
+        tmp = config.SESSION_FILE.with_suffix(f".tmp.{__import__('uuid').uuid4().hex[:8]}")
         with open(tmp, "w", encoding="utf-8") as f:
             json.dump(envelope, f)
         tmp.replace(config.SESSION_FILE)

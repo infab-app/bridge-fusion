@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 import bridge_config as config
+
 from bridge_lib.integrity import is_envelope, unwrap_and_verify, wrap_with_checksum
 from bridge_lib.path_validation import secure_file_permissions, secure_mkdir
 

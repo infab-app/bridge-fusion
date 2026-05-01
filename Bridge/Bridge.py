@@ -9,11 +9,10 @@ _addin_path = os.path.dirname(os.path.abspath(__file__))
 if _addin_path not in sys.path:
     sys.path.insert(0, _addin_path)
 
-import bridge_config as config
-from bridge_lib import ui_components
-from bridge_lib.auth_manager import AuthManager
-from bridge_lib.bridge_logger import BridgeLogger
-from bridge_lib.palette_manager import PaletteManager
+from bridge_lib import ui_components  # noqa: E402
+from bridge_lib.auth_manager import AuthManager  # noqa: E402
+from bridge_lib.bridge_logger import BridgeLogger  # noqa: E402
+from bridge_lib.palette_manager import PaletteManager  # noqa: E402
 
 _app = None
 _ui = None

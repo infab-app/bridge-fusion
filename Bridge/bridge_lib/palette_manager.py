@@ -8,8 +8,8 @@ from typing import Optional
 
 import adsk.core
 import adsk.fusion
-
 import bridge_config as config
+
 from bridge_lib.auth_manager import AuthManager
 from bridge_lib.bridge_logger import BridgeLogger
 from bridge_lib.export_manager import ExportManager
@@ -120,7 +120,8 @@ class PaletteManager:
             data = {}
 
         if action == "auth-complete":
-            self._handle_auth_complete(data if isinstance(data, str) else data.get("sessionKey", ""))
+            token = data if isinstance(data, str) else data.get("sessionKey", "")
+            self._handle_auth_complete(token)
         elif action == "request-session":
             self._handle_request_session()
         elif action == "session-rotated":
@@ -138,18 +139,27 @@ class PaletteManager:
         """Receives exchange token from auth page and exchanges it for a session."""
         if isinstance(exchange_token, str) and exchange_token:
             if AuthManager.instance().exchange_and_set_session(exchange_token):
-                BridgeLogger.instance().info("AUTH_COMPLETE", "Session established via token exchange")
+                BridgeLogger.instance().info(
+                    "AUTH_COMPLETE", "Session established via token exchange"
+                )
             else:
                 BridgeLogger.instance().warning("AUTH_EXCHANGE_FAILED", "Token exchange failed")
         else:
-            BridgeLogger.instance().warning("AUTH_EMPTY_TOKEN", "Received empty exchange token from auth")
+            BridgeLogger.instance().warning(
+                "AUTH_EMPTY_TOKEN",
+                "Received empty exchange token from auth",
+            )
 
     def _handle_request_session(self):
         """Responds to the bridge web app's request for a stored session key."""
         auth = AuthManager.instance()
-        self.send_to_palette(config.PALETTE_BRIDGE_ID, "set-session", {
-            "sessionKey": auth.session_key,
-        })
+        self.send_to_palette(
+            config.PALETTE_BRIDGE_ID,
+            "set-session",
+            {
+                "sessionKey": auth.session_key,
+            },
+        )
 
     def _handle_session_rotated(self, data: dict):
         """Updates the stored session key after server-side rotation."""
@@ -168,9 +178,9 @@ class PaletteManager:
         app = adsk.core.Application.get()
         doc = app.activeDocument
         if not doc:
-            self.send_to_palette(config.PALETTE_BRIDGE_ID, "export-error", {
-                "error": "No active document"
-            })
+            self.send_to_palette(
+                config.PALETTE_BRIDGE_ID, "export-error", {"error": "No active document"}
+            )
             return
 
         design_name = doc.name.replace(" ", "_")
@@ -191,22 +201,28 @@ class PaletteManager:
             success = exporter(filepath)
             if success:
                 file_size = os.path.getsize(filepath)
-                results.append({
-                    "format": fmt,
-                    "filename": filename,
-                    "filepath": filepath,
-                    "size": file_size,
-                })
+                results.append(
+                    {
+                        "format": fmt,
+                        "filename": filename,
+                        "filepath": filepath,
+                        "size": file_size,
+                    }
+                )
 
         self._export_paths[export_id] = {r["filename"]: r["filepath"] for r in results}
 
-        self.send_to_palette(config.PALETTE_BRIDGE_ID, "export-complete", {
-            "exportId": export_id,
-            "files": [
-                {"format": r["format"], "filename": r["filename"], "size": r["size"]}
-                for r in results
-            ],
-        })
+        self.send_to_palette(
+            config.PALETTE_BRIDGE_ID,
+            "export-complete",
+            {
+                "exportId": export_id,
+                "files": [
+                    {"format": r["format"], "filename": r["filename"], "size": r["size"]}
+                    for r in results
+                ],
+            },
+        )
 
     def _handle_upload(self, data: dict):
         """Uploads exported files to S3 using presigned URLs."""
@@ -216,9 +232,9 @@ class PaletteManager:
         auth = AuthManager.instance()
         client = auth.client
         if not client:
-            self.send_to_palette(config.PALETTE_BRIDGE_ID, "upload-error", {
-                "error": "Not signed in"
-            })
+            self.send_to_palette(
+                config.PALETTE_BRIDGE_ID, "upload-error", {"error": "Not signed in"}
+            )
             return
 
         results = []
@@ -232,19 +248,28 @@ class PaletteManager:
             if not filepath or not presigned_url:
                 continue
             if not validate_url(presigned_url):
-                BridgeLogger.instance().warning("UPLOAD_REJECTED", f"URL rejected (non-HTTPS): {presigned_url[:80]}")
+                BridgeLogger.instance().warning(
+                    "UPLOAD_REJECTED",
+                    f"URL rejected (non-HTTPS): {presigned_url[:80]}",
+                )
                 continue
 
             success = client.upload_to_s3(presigned_url, filepath, content_type)
-            results.append({
-                "uuid": resource_uuid,
-                "success": success,
-                "filename": filename,
-            })
+            results.append(
+                {
+                    "uuid": resource_uuid,
+                    "success": success,
+                    "filename": filename,
+                }
+            )
 
-        self.send_to_palette(config.PALETTE_BRIDGE_ID, "upload-complete", {
-            "results": results,
-        })
+        self.send_to_palette(
+            config.PALETTE_BRIDGE_ID,
+            "upload-complete",
+            {
+                "results": results,
+            },
+        )
 
         if export_id and export_id in self._export_paths:
             export_dir = config.TEMP_EXPORT_DIR / export_id
@@ -266,18 +291,14 @@ class PaletteManager:
             msg = f"Invalid file URL or filename (url={bool(url)}, filename={repr(filename)})"
             log.error("OPEN_FILE_INVALID", msg)
             ui.messageBox(msg, "Bridge: Open File Error")
-            self.send_to_palette(config.PALETTE_BRIDGE_ID, "open-file-error", {
-                "error": msg
-            })
+            self.send_to_palette(config.PALETTE_BRIDGE_ID, "open-file-error", {"error": msg})
             return
 
         if not validate_url(url):
             msg = "URL rejected: non-HTTPS scheme"
             log.error("OPEN_FILE_URL_REJECTED", msg)
             ui.messageBox(msg, "Bridge: Open File Error")
-            self.send_to_palette(config.PALETTE_BRIDGE_ID, "open-file-error", {
-                "error": msg
-            })
+            self.send_to_palette(config.PALETTE_BRIDGE_ID, "open-file-error", {"error": msg})
             return
 
         download_dir = config.TEMP_EXPORT_DIR / f"download_{uuid.uuid4().hex[:12]}"
@@ -293,9 +314,9 @@ class PaletteManager:
             log.error("OPEN_FILE_DOWNLOAD_FAILED", msg)
             ui.messageBox(msg, "Bridge: Download Error")
             shutil.rmtree(download_dir, ignore_errors=True)
-            self.send_to_palette(config.PALETTE_BRIDGE_ID, "open-file-error", {
-                "error": "Failed to download file"
-            })
+            self.send_to_palette(
+                config.PALETTE_BRIDGE_ID, "open-file-error", {"error": "Failed to download file"}
+            )
             return
 
         try:
@@ -321,16 +342,22 @@ class PaletteManager:
                 import_mgr.importToNewDocument(options)
 
             log.info("OPEN_FILE_SUCCESS", f"opened {filename} in Fusion")
-            self.send_to_palette(config.PALETTE_BRIDGE_ID, "open-file-complete", {
-                "filename": filename,
-            })
+            self.send_to_palette(
+                config.PALETTE_BRIDGE_ID,
+                "open-file-complete",
+                {
+                    "filename": filename,
+                },
+            )
         except Exception:
             msg = f"Import failed: {traceback.format_exc()}"
             log.error("OPEN_FILE_IMPORT_FAILED", msg)
             ui.messageBox(msg, "Bridge: Import Error")
-            self.send_to_palette(config.PALETTE_BRIDGE_ID, "open-file-error", {
-                "error": "Failed to open file in Fusion"
-            })
+            self.send_to_palette(
+                config.PALETTE_BRIDGE_ID,
+                "open-file-error",
+                {"error": "Failed to open file in Fusion"},
+            )
 
     def _handle_sign_out(self):
         auth = AuthManager.instance()

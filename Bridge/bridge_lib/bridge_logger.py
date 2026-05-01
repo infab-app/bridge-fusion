@@ -2,11 +2,10 @@ import datetime
 import json
 import platform
 import threading
-from pathlib import Path
 
 import adsk.core
-
 import bridge_config as config
+
 from bridge_lib.path_validation import secure_file_permissions, secure_mkdir
 
 

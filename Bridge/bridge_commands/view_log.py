@@ -3,7 +3,6 @@ import sys
 import traceback
 
 import adsk.core
-
 from bridge_lib.bridge_logger import BridgeLogger
 
 _handlers = []
@@ -22,9 +21,7 @@ class ViewLogCommand(adsk.core.CommandCreatedEventHandler):
             _handlers.append(execute_handler)
         except Exception:
             app = adsk.core.Application.get()
-            app.userInterface.messageBox(
-                f"View Log failed:\n{traceback.format_exc()}"
-            )
+            app.userInterface.messageBox(f"View Log failed:\n{traceback.format_exc()}")
 
 
 class _ViewLogExecuteHandler(adsk.core.CommandEventHandler):
@@ -49,6 +46,7 @@ class _ViewLogExecuteHandler(adsk.core.CommandEventHandler):
             path_str = str(log_path)
             if sys.platform == "win32":
                 import os
+
                 if log_path.is_file():
                     subprocess.Popen(["explorer", "/select,", path_str])
                 else:
@@ -60,6 +58,4 @@ class _ViewLogExecuteHandler(adsk.core.CommandEventHandler):
                     subprocess.Popen(["open", path_str])
         except Exception:
             app = adsk.core.Application.get()
-            app.userInterface.messageBox(
-                f"Failed to open log:\n{traceback.format_exc()}"
-            )
+            app.userInterface.messageBox(f"Failed to open log:\n{traceback.format_exc()}")

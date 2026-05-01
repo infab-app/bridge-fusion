@@ -1,5 +1,4 @@
 import adsk.core
-
 import bridge_config as config
 
 _command_definitions = []

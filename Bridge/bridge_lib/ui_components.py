@@ -1,5 +1,4 @@
 import adsk.core
-
 import bridge_config as config
 
 _panels_created = []
